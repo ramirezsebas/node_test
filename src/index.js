@@ -25,7 +25,7 @@ function rand() {
 function main() {
   const hoursClassroom = hoursUsedClassroomPerYear();
 
-  // Generate the tubes
+  // Generate the initial tubes
   // We have 4 supports with 4 tubes each
   const totalSupportTube = 4;
   const numberTubeSupport = 4;
@@ -36,11 +36,8 @@ function main() {
     for (let index = 0; index < numberTubeSupport; index++) {
       const fixedHoursTubeUse = rand();
 
-      // Since we have the hours the classroom is used per year,
-      // we can calculate the amount of times the tube will break
       tubes.push({
         fixedHoursTubeUse: fixedHoursTubeUse,
-        numberTimesBroken: Math.floor(hoursClassroom / fixedHoursTubeUse),
       });
     }
     supports.push({
@@ -48,54 +45,64 @@ function main() {
     });
   }
 
-  // Count the amount of tubes broken
-  let count = 0;
-  for (let i = 0; i < totalSupportTube; i++) {
-    for (let j = 0; j < numberTubeSupport; j++) {
-      // Since the number of times the tube is broken is a year,
-      // we can just sum all the tubes
-      const element = supports[i].tubes[j].numberTimesBroken;
-      count += element;
+  let numberBrokenTubes = 0;
+  let numberTubes = totalSupportTube * numberTubeSupport;
+
+  for (let i = hoursClassroom; i >= 0; i--) {
+    // console.log("Estamos en hora", hoursClassroom);
+
+    for (let i = 0; i < supports.length; i++) {
+      // console.log("Support N°", i);
+      const support = supports[i];
+
+      // console.log("Current tubes", support.tubes);
+
+      // Decrement by 1 hour each tube that is not in zero.
+      // Since we can have up to 2 broken tubes, we have to check
+      // if its greater than 0.
+      support.tubes = support.tubes.map((e) => {
+        if (e.fixedHoursTubeUse <= 0) {
+          return e;
+        }
+
+        return {
+          fixedHoursTubeUse: e.fixedHoursTubeUse - 1,
+        };
+      });
+
+      // console.log("Updated tubes", support.tubes);
+
+      // Check if 2 tubes are broken
+      const brokenTubes = support.tubes.filter((e) => e.fixedHoursTubeUse <= 0);
+
+      // Their are 2 broken tubes, so we replace all tubes.
+      // We assume that, when we change the tubes, each will recieve
+      // a new value for use in hours.
+      if (brokenTubes.length == 2) {
+        // Increment the number of broken tubes
+        numberBrokenTubes += 2;
+        // console.log("2 broken tubes, so we change all of it");
+        support.tubes = support.tubes.map((e) => {
+          return {
+            fixedHoursTubeUse: rand(),
+          };
+        });
+        // Increment the total number of tubes used.
+        numberTubes += 4;
+        // console.log("Replaced tubes", support.tubes);
+      }
     }
   }
 
-  console.log("In 1 year", count, "fluorescent tubes were broken.");
+  console.log("In 1 year", numberBrokenTubes, "fluorescent tubes were broken.");
 
-  const initialNumberFluorecent = totalSupportTube * numberTubeSupport;
-  const cost = 7;
-
-  // Sort the tubes by the amount of hours they last
-  for (let i = 0; i < totalSupportTube; i++) {
-    supports[i].tubes = supports[i].tubes.sort(
-      (a, b) => a.fixedHoursTubeUse - b.fixedHoursTubeUse
-    );
-  }
-
-  let numberNewTubesBought = 0;
-  for (let i = 0; i < totalSupportTube; i++) {
-    // Since my interest is for the firsst two tubes
-    // because they are the ones that last less.
-    // So when they both break, all 4 tubes are changed
-    const firstElementToBreak = supports[i].tubes[0].fixedHoursTubeUse;
-    const secondElementToBreak = supports[i].tubes[1].fixedHoursTubeUse;
-
-    // We calculate the amount of times the tubes are changed
-    // and multiply by 4 because we change all the tubes
-    const totalChangedtubes =
-      (hoursClassroom / (firstElementToBreak + secondElementToBreak)) * 4;
-
-    numberNewTubesBought += totalChangedtubes;
-  }
-
-  const totalCostTubes = initialNumberFluorecent + numberNewTubesBought * cost;
+  const totalCostTubes = numberTubes * 7;
 
   console.log(
     "The university pays for one classroom",
-    "$" + totalCostTubes.toFixed(2),
-    "in tubes per year.",
-    "Paying for a total of",
-    (initialNumberFluorecent + numberNewTubesBought).toFixed(0),
-    "tubes incluiding the ones that have been changed."
+    "$",
+    totalCostTubes.toFixed(2),
+    "in tubes per year."
   );
 }
 
