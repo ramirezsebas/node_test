@@ -22,6 +22,12 @@ function rand() {
   return Math.floor(Math.random() * 101) + 100;
 }
 
+/**
+ * This function simulates the use of fluorescent tubes in a classroom.
+ * @param {number} totalSupportTube
+ * @param {number} numberTubeSupport
+ * @returns {void}
+ */
 function tubeSimulation(totalSupportTube, numberTubeSupport) {
   const hoursClassroom = hoursUsedClassroomPerYear();
 
