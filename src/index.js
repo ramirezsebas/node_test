@@ -22,13 +22,11 @@ function rand() {
   return Math.floor(Math.random() * 101) + 100;
 }
 
-function main() {
+function tubeSimulation(totalSupportTube, numberTubeSupport) {
   const hoursClassroom = hoursUsedClassroomPerYear();
 
-  // Generate the initial tubes
-  // We have 4 supports with 4 tubes each
-  const totalSupportTube = 4;
-  const numberTubeSupport = 4;
+  // Generate inicial tubes for the year,
+  // with fixedHoursTubeUse
   const supports = [];
 
   for (let index = 0; index < totalSupportTube; index++) {
@@ -46,13 +44,15 @@ function main() {
   }
 
   let numberBrokenTubes = 0;
+
+  // Initial number of tubes in this case would be 16.
   let numberTubes = totalSupportTube * numberTubeSupport;
 
   for (let i = hoursClassroom; i >= 0; i--) {
-    // console.log("Estamos en hora", hoursClassroom);
+    // console.log("Current hour:", hoursClassroom);
 
     for (let i = 0; i < supports.length; i++) {
-      // console.log("Support N°", i);
+      // console.log("Support N°", i + 1);
       const support = supports[i];
 
       // console.log("Current tubes", support.tubes);
@@ -99,11 +99,18 @@ function main() {
   const totalCostTubes = numberTubes * 7;
 
   console.log(
-    "The university pays for one classroom",
+    "The university spends for one classroom",
     "$",
     totalCostTubes.toFixed(2),
     "in tubes per year."
   );
+}
+
+function main() {
+  const totalSupportTube = 4;
+  const numberTubeSupport = 4;
+
+  tubeSimulation(totalSupportTube, numberTubeSupport);
 }
 
 main();
